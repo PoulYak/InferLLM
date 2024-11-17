@@ -4,27 +4,33 @@ FROM nvidia/cuda:11.8.0-base-ubuntu20.04
 # Set working directory
 WORKDIR /app
 
+# Set non-interactive frontend for apt and preconfigure tzdata
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Etc/UTC
 
 # Install system dependencies and Python 3.11
 RUN apt-get update && apt-get install -y \
     software-properties-common \
-    gcc wget git curl \
-    && add-apt-repository ppa:deadsnakes/ppa \
+    gcc wget git curl tzdata \
     && apt-get update && apt-get install -y \
     python3.11 python3.11-dev python3.11-distutils \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Python 3.11 as default
+# Set Python 3.11 as the default Python version
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
 
 # Install pip for Python 3.11
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
 
-COPY requirements.txt .
-RUN pip install --upgrade pip &&  \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install huggingface-hub \
+# Upgrade pip to the latest version
+RUN pip install --no-cache-dir --upgrade pip
 
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Hugging Face CLI
+RUN pip install huggingface-hub
 ARG HF_TOKEN
 RUN huggingface-cli login --token $HF_TOKEN
 
