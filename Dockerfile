@@ -1,5 +1,5 @@
 # Use an NVIDIA base image with Python and CUDA support
-FROM nvidia/cuda:11.4.3-base-ubuntu20.04
+FROM nvidia/cuda:11.8.0-base-ubuntu20.04
 
 # Set working directory
 WORKDIR /app
