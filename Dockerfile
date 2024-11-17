@@ -4,6 +4,9 @@ FROM nvidia/cuda:11.8.0-base-ubuntu20.04
 # Set working directory
 WORKDIR /app
 
+# Set non-interactive frontend for apt
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install system dependencies and Python 3.11
 RUN apt-get update && apt-get install -y \
     software-properties-common \
@@ -14,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Python 3.11 as default
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
 
 # Install pip for Python 3.11
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
