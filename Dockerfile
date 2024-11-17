@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Hugging Face CLI
-RUN pip install huggingface-hub
+RUN pip install --upgrade pip &&  \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install huggingface-hub
 
 # Set up Hugging Face token for authentication
 ARG HF_TOKEN
