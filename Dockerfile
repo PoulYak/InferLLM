@@ -20,8 +20,7 @@ RUN pip install huggingface-hub
 
 # Set up Hugging Face token for authentication
 ARG HF_TOKEN
-RUN mkdir -p ~/.huggingface && \
-    echo "$HF_TOKEN" > ~/.huggingface/token
+RUN huggingface-cli login --token $HF_TOKEN
 
 # Copy application code
 COPY main.py .
