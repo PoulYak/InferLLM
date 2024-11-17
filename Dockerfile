@@ -4,8 +4,6 @@ FROM nvidia/cuda:11.8.0-base-ubuntu20.04
 # Set working directory
 WORKDIR /app
 
-# Set non-interactive frontend for apt
-ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies and Python 3.11
 RUN apt-get update && apt-get install -y \
