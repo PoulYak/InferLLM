@@ -8,12 +8,13 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-# Install system dependencies (без установки Python, он предустановлен)
+# Install system dependencies and Python
 RUN apt-get update && apt-get install -y \
+    python3 python3-pip python3-dev python3-distutils \
     gcc wget git curl tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip for the preinstalled Python version
+# Upgrade pip for the installed Python version
 RUN python3 -m pip install --no-cache-dir --upgrade pip
 
 # Install Python dependencies
@@ -23,7 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install Hugging Face CLI
 RUN pip install huggingface-hub
 ARG HF_TOKEN
-RUN huggingface-cli login --token $HF_TOKEN
+RUN echo $HF_TOKEN | huggingface-cli login --token
 
 # Copy application code
 COPY main.py .
