@@ -1,5 +1,5 @@
 # Base image with CUDA 11.8 and Ubuntu 22.04
-FROM nvidia/cuda:11.8.0-base-ubuntu22.04
+FROM nvidia/cuda:11.6.0-base-ubuntu22.04
 
 # Set working directory
 WORKDIR /app
