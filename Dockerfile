@@ -1,5 +1,5 @@
-# Base image with CUDA 11.8 and Ubuntu 20.04
-FROM nvidia/cuda:11.8.0-base-ubuntu20.04
+# Base image with CUDA 11.8 and Ubuntu 24.04
+FROM nvidia/cuda:11.8.0-base-ubuntu24.04
 
 # Set working directory
 WORKDIR /app
@@ -8,22 +8,13 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-# Install system dependencies and Python 3.11
+# Install only system dependencies (без установки Python)
 RUN apt-get update && apt-get install -y \
-    software-properties-common \
     gcc wget git curl tzdata \
-    && apt-get update && apt-get install -y \
-    python3.11 python3.11-dev python3.11-distutils \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Python 3.11 as the default Python version
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
-
-# Install pip for Python 3.11
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
-
-# Upgrade pip to the latest version
-RUN pip install --no-cache-dir --upgrade pip
+# Upgrade pip for the preinstalled Python version
+RUN python3 -m pip install --no-cache-dir --upgrade pip
 
 # Install Python dependencies
 COPY requirements.txt .
