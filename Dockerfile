@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install Hugging Face CLI
 RUN pip install huggingface-hub
 ARG HF_TOKEN
-RUN echo $HF_TOKEN | huggingface-cli login --token
+RUN huggingface-cli login --token $HF_TOKEN
 
 # Copy application code
 COPY main.py .
