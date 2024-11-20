@@ -1,5 +1,4 @@
-# Base image with CUDA 11.8 and Ubuntu 22.04
-FROM nvidia/cuda:11.6.0-base-ubuntu22.04
+FROM pytorch/pytorch:1.13.1-cuda11.6-cudnn8-runtime
 
 # Set working directory
 WORKDIR /app
@@ -8,21 +7,22 @@ WORKDIR /app
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-# Install system dependencies and Python
+# Install system dependencies (optional, if needed for your app)
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip python3-dev python3-distutils \
     gcc wget git curl tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip for the installed Python version
-RUN python3 -m pip install --no-cache-dir --upgrade pip
+# Upgrade pip (installed via conda) and install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip
 
-# Install Python dependencies
+# Copy requirements.txt and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Hugging Face CLI
 RUN pip install huggingface-hub
+
+# Use Hugging Face token (if provided) for authentication
 ARG HF_TOKEN
 RUN huggingface-cli login --token $HF_TOKEN
 
@@ -32,5 +32,5 @@ COPY main.py .
 # Expose the FastAPI port
 EXPOSE 8000
 
-# Command to start the app
+# Command to start the app (example: FastAPI app)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
