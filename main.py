@@ -16,7 +16,7 @@ MODEL_NAME = "meta-llama/Meta-Llama-3.1-8B-Instruct"  # Укажите имя м
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 quantization_config = BitsAndBytesConfig(load_in_4bit=True,
-                                        bnb_4bit_compute_dtype=torch.float16)
+                                         bnb_4bit_compute_dtype=torch.float16)
 
 try:
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -28,6 +28,7 @@ try:
 except Exception as e:
     raise RuntimeError(f"Ошибка загрузки модели: {e}")
 
+
 # Схема данных для запросов
 class InferenceRequest(BaseModel):
     prompt: str
@@ -35,19 +36,22 @@ class InferenceRequest(BaseModel):
     temperature: float = 0.7  # Температура для управления разнообразием
     top_k: int = 50  # Используется для сужения набора токенов на основе вероятности
 
+
 # Схема данных для ответов
 class InferenceResponse(BaseModel):
     generated_text: str
+
+
+def get_prompt(text):
+    prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nCutting Knowledge Date: December 2024\nToday Date: 28 Dec 2024\n\nYou are assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{message}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"""
+    return prompt.format(message=text)
+
 
 # Корневой маршрут
 @app.get("/")
 def read_root():
     return {"message": "LLaMA 3-Instruct API работает!"}
 
-
-def get_prompt(text):
-    prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nCutting Knowledge Date: December 2024\nToday Date: 28 Dec 2024\n\nYou are assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{message}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"""
-    return prompt.format(message=text)
 
 # Эндпоинт для инференса
 @app.post("/generate", response_model=InferenceResponse)
@@ -70,6 +74,7 @@ def generate_text(request: InferenceRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # # Запуск: uvicorn main:app --reload
 if __name__ == "__main__":
