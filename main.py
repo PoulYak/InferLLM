@@ -44,12 +44,16 @@ class InferenceResponse(BaseModel):
 def read_root():
     return {"message": "LLaMA 3-Instruct API работает!"}
 
+
+def get_prompt(text):
+    prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nCutting Knowledge Date: December 2024\nToday Date: 28 Dec 2024\n\nYou are assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{message}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"""
+    return prompt.format(message=text)
+
 # Эндпоинт для инференса
 @app.post("/generate", response_model=InferenceResponse)
 def generate_text(request: InferenceRequest):
     try:
-        # Токенизация ввода
-        inputs = tokenizer.encode(request.prompt, return_tensors="pt").to(device)
+        inputs = tokenizer.encode(get_prompt(request.prompt), return_tensors="pt").to(device)
 
         # Генерация текста
         outputs = model.generate(
