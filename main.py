@@ -40,6 +40,7 @@ class InferenceRequest(BaseModel):
 # Схема данных для ответов
 class InferenceResponse(BaseModel):
     generated_text: str
+    generated_text_with_tokens: str
 
 
 def get_prompt(text):
@@ -54,10 +55,33 @@ def read_root():
 
 
 # Эндпоинт для инференса
+@app.post("/generate_question", response_model=InferenceResponse)
+def generate_question(request: InferenceRequest):
+    try:
+        inputs = tokenizer.encode(get_prompt(request.prompt), return_tensors="pt").to(device)
+
+        # Генерация текста
+        outputs = model.generate(
+            inputs,
+            max_length=request.max_length,
+            temperature=request.temperature,
+            top_k=request.top_k,
+            do_sample=True,
+        )
+
+        # Декодирование результата
+        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        generated_text_with_tokens = tokenizer.decode(outputs[0])
+        return InferenceResponse(generated_text=generated_text,
+                                 generated_text_with_tokens=generated_text_with_tokens)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/generate", response_model=InferenceResponse)
 def generate_text(request: InferenceRequest):
     try:
-        inputs = tokenizer.encode(get_prompt(request.prompt), return_tensors="pt").to(device)
+        inputs = tokenizer.encode(request.prompt, return_tensors="pt").to(device)
 
         # Генерация текста
         outputs = model.generate(
