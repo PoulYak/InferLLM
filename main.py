@@ -47,6 +47,10 @@ class InferenceRequest(BaseModel):
 # Схема данных для ответов
 class InferenceResponse(BaseModel):
     generated_text: str
+    answer: str
+
+def get_last_answer(text):
+    return text.split('<|end_header_id|>\n\n')[-1]
 
 def make_prompt_chat(chat):
     prompt = ["<|begin_of_text|>"]
@@ -57,7 +61,6 @@ def make_prompt_chat(chat):
         if role=='system':
             prompt.append('Cutting Knowledge Date: December 2024\nToday Date: 28 Dec 2024\n\n')
         if content:
-
             prompt.append(content)
             prompt.append(f"<|eot_id|>")
     return ''.join(prompt)
@@ -89,8 +92,9 @@ def generate_text(request: InferenceRequest):
         )
 
         # Декодирование результата
-        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return InferenceResponse(generated_text=generated_text)
+        generated_text = tokenizer.decode(outputs[0])
+        answer = get_last_answer(generated_text)
+        return InferenceResponse(generated_text=generated_text, answer=answer)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
