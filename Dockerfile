@@ -28,6 +28,7 @@ RUN huggingface-cli login --token $HF_TOKEN
 
 # Copy application code
 COPY main.py .
+COPY static /app/static
 
 # Expose the FastAPI port
 EXPOSE 8000

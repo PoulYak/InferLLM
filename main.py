@@ -3,6 +3,10 @@ from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 import torch
 import uvicorn
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
+
+
 
 # Инициализация приложения FastAPI
 app = FastAPI(
@@ -10,6 +14,9 @@ app = FastAPI(
     description="API для инференса LLaMA 3-Instruct",
     version="1.0.0",
 )
+
+# Подключение статики
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Инициализация модели и токенайзера
 MODEL_NAME = "meta-llama/Meta-Llama-3.1-8B-Instruct"  # Укажите имя модели из Hugging Face
@@ -50,8 +57,8 @@ def get_prompt(text):
 
 # Корневой маршрут
 @app.get("/")
-def read_root():
-    return {"message": "LLaMA 3-Instruct API работает!"}
+def redirect_to_ui():
+    return RedirectResponse(url="/static/index.html")
 
 
 # Эндпоинт для инференса
