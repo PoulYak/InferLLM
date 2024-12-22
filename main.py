@@ -27,6 +27,7 @@ quantization_config = BitsAndBytesConfig(load_in_4bit=True,
 
 try:
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    tokenizer.pad_token = tokenizer.eos_token
 
     model = AutoModelForCausalLM.from_pretrained(MODEL_NAME,
                                                  quantization_config=quantization_config,
@@ -93,7 +94,7 @@ def generate_text(request: InferenceRequest):
             temperature=request.temperature,
             top_k=request.top_k,
             do_sample=True,
-            pad_token_id=tokenizer.eos_token_id
+            pad_token_id=tokenizer.pad_token_id
         )
 
         # Декодирование результата
