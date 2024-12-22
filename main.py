@@ -48,7 +48,19 @@ class InferenceRequest(BaseModel):
 class InferenceResponse(BaseModel):
     generated_text: str
 
+def make_prompt_chat(chat):
+    prompt = ["<|begin_of_text|>"]
+    for message in chat:
+        role = message['role']
+        content = message['content']
+        prompt.append(f"<|start_header_id|>{role}<|end_header_id|>\n\n")
+        if role=='system':
+            prompt.append('Cutting Knowledge Date: December 2024\nToday Date: 28 Dec 2024\n\n')
+        if content:
 
+            prompt.append(content)
+            prompt.append(f"<|eot_id|>")
+    return ''.join(prompt)
 
 def get_prompt(text):
     prompt = """<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nCutting Knowledge Date: December 2024\nToday Date: 28 Dec 2024\n\nYou are assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{message}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"""
@@ -84,6 +96,5 @@ def generate_text(request: InferenceRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# # Запуск: uvicorn main:app --reload
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
