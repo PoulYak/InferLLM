@@ -95,7 +95,7 @@
     </div>
 
     <script>
-        const API_URL = "http://0.0.0.0:8000/generate"; // URL API
+        const API_URL = "http://81.94.159.166:8000/generate"; // URL API
 
         async function sendMessage() {
             const userInput = document.getElementById("user-input").value;
@@ -123,7 +123,7 @@
                 const data = await response.json();
 
                 // Append assistant message
-                addMessage(data.generated_text, "assistant");
+                addMessage(data.answer, "assistant");
             } catch (error) {
                 addMessage("Error: Unable to generate response.", "assistant");
                 console.error(error);

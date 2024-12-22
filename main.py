@@ -50,7 +50,8 @@ class InferenceResponse(BaseModel):
     answer: str
 
 def get_last_answer(text):
-    return text.split('<|end_header_id|>\n\n')[-1]
+    return text.split('<|end_header_id|>\n\n')[-1].replace('<|eot_id|>', '')
+
 
 def make_prompt_chat(chat):
     prompt = ["<|begin_of_text|>"]
@@ -80,15 +81,19 @@ def redirect_to_ui():
 def generate_text(request: InferenceRequest):
     try:
         # Токенизация ввода
-        inputs = tokenizer.encode(request.prompt, return_tensors="pt").to(device)
+        inputs = tokenizer(get_prompt(request.prompt), return_tensors="pt", padding=True, truncation=True).to(device)
 
+        # Установка attention_mask
+        attention_mask = inputs["attention_mask"]
         # Генерация текста
         outputs = model.generate(
-            inputs,
+            inputs["input_ids"],
+            attention_mask=inputs["attention_mask"],
             max_length=request.max_length,
             temperature=request.temperature,
             top_k=request.top_k,
             do_sample=True,
+            pad_token_id=tokenizer.eos_token_id
         )
 
         # Декодирование результата
