@@ -1,0 +1,31 @@
+# Use a lightweight Python base image
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
+
+# Install PyTorch and other Python dependencies
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Copy requirements.txt and install Python dependencies
+COPY requirements.cpu.txt .
+RUN pip install -r requirements.cpu.txt
+
+# Install Hugging Face CLI
+RUN pip install huggingface-hub
+
+# Use Hugging Face token (if provided) for authentication
+ARG HF_TOKEN
+RUN huggingface-cli login --token $HF_TOKEN
+
+# Copy application code
+COPY main.py .
+
+# Expose the FastAPI port
+EXPOSE 8000
+
+# Command to start the app (example: FastAPI app)
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

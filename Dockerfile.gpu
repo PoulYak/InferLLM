@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --no-cache-dir --upgrade pip
 
 # Copy requirements.txt and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.gpu.txt .
+RUN pip install -r requirements.gpu.txt
 
 # Install Hugging Face CLI
 RUN pip install huggingface-hub
@@ -28,7 +28,6 @@ RUN huggingface-cli login --token $HF_TOKEN
 
 # Copy application code
 COPY main.py .
-COPY static /app/static
 
 # Expose the FastAPI port
 EXPOSE 8000
